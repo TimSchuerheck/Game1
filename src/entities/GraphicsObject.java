@@ -10,7 +10,7 @@ import graphics.VertexArrayObject;
 import utilities.OBJLoader;
 
 public class GraphicsObject implements Renderable{
-	private VertexArrayObject vao;
+	public VertexArrayObject vao;
 	private float[] vertexCoords, vertexColors, textureCoords, normals;
 	private int[] indices;
 	private Camera camera;

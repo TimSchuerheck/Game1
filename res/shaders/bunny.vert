@@ -10,14 +10,15 @@ out vec3 to_camera_vector;
 out vec3 to_light_vector;
 
 
-out vec3 original_normals;
+out vec3 mdlspc_normals;
 
 uniform vec3 light_position;
 uniform mat4 view, projection, model;
 
 void main(){
         tc_vert = tc_in;
-        original_normals = normals_in;
+        mdlspc_normals = (transpose(inverse(model)) * vec4(normals_in, 1.0)).xyz;
+        
         mat4 model_view              = view * model;
         vec3 position_in_viewspace   = vec4(model_view * vec4(vertex_in, 1.0)).xyz;
        

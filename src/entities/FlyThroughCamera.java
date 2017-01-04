@@ -17,7 +17,7 @@ public class FlyThroughCamera extends Camera {
 	private float acceleration = 2f;
 	private float decelerationX, decelerationY;
 	private final float DECELERATION = 4.5f;
-	private final float LIMIT = 2.5f;
+	private final float LIMIT = 1f;
 	Vector3f targetToCamera;
 	Vector2f velocity = new Vector2f();
 	private GameObject targetObject;
@@ -89,6 +89,10 @@ public class FlyThroughCamera extends Camera {
 		if (velocity.x < 0){
 			velocity.x += decelerationX * (float) deltaTime;
 		}
+
+		//if(velocity.y > -0.03 && velocity.y < 0.03) velocity.y = 0f;
+		//if(velocity.x > -0.03 && velocity.x < 0.03) velocity.x = 0f;
+
 	}
 
 	double lastX = 0, lastY = 0;

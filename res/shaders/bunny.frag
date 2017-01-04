@@ -7,7 +7,7 @@ in vec3 normals_vert;
 in vec3 to_camera_vector;
 in vec3 to_light_vector;
 
-in vec3 original_normals;
+in vec3 mdlspc_normals;
 
 uniform float shininess;
 uniform samplerCube tex0;
@@ -21,7 +21,7 @@ void main(){
 		
 		vec3 fellFarbe = vec3(1f,1f,1f);
 		
-		vec4 environment = texture(tex0, original_normals);
+		vec4 environment = texture(tex0, mdlspc_normals);
 		
        vec3 ambient = vec3(1.0,1.0,1.0);
        

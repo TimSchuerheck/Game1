@@ -1,6 +1,9 @@
 package entities;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -18,23 +21,21 @@ import graphics.Shaderprogram;
 public class Scene {
 	public GameObject hero;
 	public Plane plane;
-	private Shaderprogram sqr_shader, ground_shader, sky_shader, bunny_shader;
+	private Shaderprogram sqr_shader, ground_shader, sky_shader, bunny_shader, 
+												bloom_shader, grass_shader, landscape_shader, star_shader;
 	public FlyThroughCamera camera;
-	public Cross cross;
-	public Point point;
-	Matrix4f projection_matrix, projection_matrix_sky, projection_matrix_shortFPlane;
+	Matrix4f projection_matrix, projection_matrix_sky;
 	private float fov, nplane, fplane;
-	private ArrayList<GameObject> cubes;
-	private Bunny bun, bun1, bun2 , bun3;
+	private Bunny bun;
 	private SkyBox skyBox;
 	private GrassField grassField;
-	private Shaderprogram grass_shader, landscape_shader;
 	private Landscape landscape;
-	private ArrayList <Bunny> bunnyList;
+	public CopyOnWriteArrayList <Bunny> bunnyList = new CopyOnWriteArrayList<Bunny>();
+	public CopyOnWriteArrayList <ParticleField> particleFieldList = new CopyOnWriteArrayList<ParticleField>();
+	private Bloom bloom;
 
 	public Scene() {
 		
-		bunnyList = new ArrayList<Bunny>();
 		
 		// init Camera
 		fov = 60f;
@@ -43,55 +44,33 @@ public class Scene {
 		
 		//INIT GAME OBJECTS
 		camera = new FlyThroughCamera();
-		
 		skyBox = new SkyBox();
 		plane = new Plane();
 		hero = new Cube();
-		grassField = new GrassField(10000);
+		grassField = new GrassField(2000);
 		landscape = new Landscape();
-		bun = new Bunny(hero, bunnyList);
-		bun1 = new Bunny(hero, bunnyList);
-		bun2 = new Bunny(hero, bunnyList);
-		bun3 = new Bunny(hero, bunnyList);
-		
-		cubes = new ArrayList<GameObject>();
-		for (int i = 0; i<4; i++) {
-			cubes.add(new Cube(new Vector3f(1f,0.8f,0f)));
-			cubes.get(i).setCamera(camera);
-		}
-		((Cube) cubes.get(0)).setPosition(new Vector3f(10f, 0f, 10f));
-		((Cube) cubes.get(1)).setPosition(new Vector3f(-10f, 0f, -10f));
-		((Cube) cubes.get(2)).setPosition(new Vector3f(10f, 0f, -10f));
-		((Cube) cubes.get(3)).setPosition(new Vector3f(-10f, 0f, 10f));
-		
+		bun = new Bunny(hero, this);
+
 		camera.setTarget(hero);
 		
 		//SET CAMERAS
 		plane.setCamera(camera);
 		bun.setCamera(camera);
-		bun1.setCamera(camera);
-		bun2.setCamera(camera);
-		bun3.setCamera(camera);
-		
 		
 		skyBox.setCamera(camera);
 		hero.setCamera(camera);
 		grassField.setCamera(camera);
 		landscape.setCamera(camera);
 		
-		bun.setPosition(new Vector3f(0f,0f,10f));
-		bun1.setPosition(new Vector3f(0f,0f,-10f));
-		bun2.setPosition(new Vector3f(10f,0f,0f));
-		bun3.setPosition(new Vector3f(-10f,0f,0f));
 		
-		bun1.setRotation((float)Math.PI/2);
-		bun2.setRotation((float)Math.PI);
-		bun3.setRotation((float)Math.PI/4/3f);
+		bun.setPosition(new Vector3f(0f,0f,10f));
 		
 		bunnyList.add(bun);
 		//bunnyList.add(bun1);
 		//bunnyList.add(bun2);
 		//bunnyList.add(bun3);
+		
+		//bloom = new Bloom();
 		
 		//SHADER
 		sky_shader = new Shaderprogram("res/shaders/sky.vert", "res/shaders/sky.frag");
@@ -100,34 +79,50 @@ public class Scene {
 		bunny_shader = new Shaderprogram("res/shaders/bunny.vert", "res/shaders/bunny.frag");
 		grass_shader = new Shaderprogram("res/shaders/grass.vert", "res/shaders/grass.frag");
 		landscape_shader = new Shaderprogram("res/shaders/landscape.vert", "res/shaders/landscape.frag");
+		bloom_shader = new Shaderprogram("res/shaders/bloom.vert", "res/shaders/bloom.frag");
+		star_shader = new Shaderprogram("res/shaders/star.vert", "res/shaders/star.frag");
 	}
 	
 	public void update(double deltaTime) {
-		cubes.remove(hero.collisionTest(cubes));
 		for(Bunny each: bunnyList) each.update(deltaTime);
+		for(ParticleField each: particleFieldList) each.update(deltaTime);
 	}
 
 	public void render() {
+		//bloom.bindFramebuffer();
 		skyBox.render(sky_shader, projection_matrix_sky);
 		plane.render(ground_shader, projection_matrix);
 		landscape.render(landscape_shader, projection_matrix_sky);
 		for(Bunny each: bunnyList) each.render(bunny_shader, projection_matrix);
 
 		hero.render(sqr_shader, projection_matrix);
-		for (GameObject each : cubes) {
-			each.render(sqr_shader, projection_matrix);
-		}
+
 		grassField.render(grass_shader, projection_matrix);
+		for(ParticleField each: particleFieldList) each.render(star_shader, projection_matrix);
+		//bloom.unbindFramebuffer();
+		//bloom.render(bloom_shader, projection_matrix);
 	}
 
 	public void updatePerspective(int width, int height) {
 		projection_matrix = new Matrix4f().perspective((float) Math.toRadians(fov), width / (float)height, nplane, fplane);
 		projection_matrix_sky = new Matrix4f().perspective((float) Math.toRadians(fov), width / (float)height, nplane, 30000000);
-		projection_matrix_shortFPlane = new Matrix4f().perspective((float) Math.toRadians(fov), width / (float)height, nplane, 30);
 		
 	}
 
 	public void updateCamera(int width, int height) {
 		camera.updateViewMatrix();
+	}
+	
+	public void killBunny(Bunny bun){
+		bunnyList.remove(bun);
+	}
+	
+	public void killParticleField(ParticleField pf){
+		particleFieldList.remove(pf);
+	}
+	
+	public void spawnParticleField(Vector3f position){
+		ParticleField pf = new ParticleField(camera, this, position);
+		particleFieldList.add(pf);
 	}
 }

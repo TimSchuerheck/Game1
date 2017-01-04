@@ -3,7 +3,6 @@ package windowmanager;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
-import java.util.Hashtable;
 
 import entities.Scene;
 import utilities.Input;
@@ -15,10 +14,12 @@ import utilities.Input;
  */
 public class MyWindow extends Window {
 	private Scene scene;
-
+	public static int windowWidth, windowHeight;
+	
 	public MyWindow(int width, int height) {
 		super(width, height);
-		
+		windowWidth = width;
+		windowHeight = height;
 	}
 
 	// Gets called once after the window is created //

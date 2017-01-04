@@ -15,7 +15,7 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 	public int state;
 	public final int IDLE = 0, STANDING = 1, JUMP_1 = 2, JUMP_2 = 3;
 	private GameObject hero;
-	private ArrayList<Bunny> parentHook;
+	private Scene parent;
 	private Jump jump;
 	
 	private static GraphicsObject[] models = {
@@ -45,9 +45,9 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 			"res/textures/light_box/cubeSides4.png"
 	});
 	
-	public Bunny(GameObject hero, ArrayList<Bunny> bunnyList){
+	public Bunny(GameObject hero, Scene parent){
 		this.hero = hero;
-		this.parentHook = bunnyList;
+		this.parent = parent;
 		state = IDLE;
 		graphics = models[state];
 		setScale(0.02f);
@@ -73,20 +73,22 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 		if(distance < 15f) state = STANDING;
 		else state = IDLE;
 		
-		float heroRotOffset = (float)Math.PI/2f;
 		Vector3f dir = new Vector3f(0f, 0f, 1f).mul(new Matrix3f().rotateY(rotation));
-		Vector3f heroDir = new Vector3f(0f, 0f, 1f).mul(new Matrix3f().rotateY(hero.rotation + heroRotOffset));
-		dir.normalize();
-		heroDir.normalize();
-		float alpha = dir.dot(heroDir);
-		
-		if(alpha < -0.5f && distance < 8f && jump == null) jump = new Jump(dir, this);
-		if(jump != null) jump.proceed(deltaTime);
-	}
-	
-	private void jump(double deltaTime){
-		
 
+		Vector3f heroPos = new Vector3f(hero.position);
+		Vector3f bunnyToHero = new Vector3f();
+		heroPos.sub(position, bunnyToHero);
+		bunnyToHero.normalize();
+		
+		dir.normalize();
+		float alpha = dir.dot(bunnyToHero);
+		
+		if(alpha > -0.5f && distance < 8f && jump == null) jump = new Jump(this);
+		if(jump != null) jump.proceed(deltaTime);
+		if(distance < 0.5f && jump == null) {
+			parent.killBunny(this);
+			parent.spawnParticleField(hero.position);
+		}
 	}
 	
 	public void killJump(){

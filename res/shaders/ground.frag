@@ -35,7 +35,9 @@ void main(){
         float cos_betaK 	= pow(cos_beta, shininess);
 		vec3 specularTerm 	= texture(tex1, tc_vert).rgb * cos_betaK;
 		
-		color = vec4(horizon_blending + diffuseTerm + specularTerm * 1.5, 1.0);
+
+
+  		color = vec4(horizon_blending + diffuseTerm + specularTerm * 1.5, 1.0);
         //color = vec4( diffuseTerm + specularTerm * 1.5 ,1.0) + ambient_light;
 
        if(color.w < 1.0)
