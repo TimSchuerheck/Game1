@@ -22,8 +22,14 @@ public class SkyBox implements Renderable{
 						"res/textures/day/cubeTop.png",
 						"res/textures/day/cubeBot.png",
 						"res/textures/day/cubeSides2.png",
-						"res/textures/day/cubeSides4.png"})
-				//new Texture(new String[]{"res/images/night/cubeSides.png","res/images/night/cubeSides.png","res/images/night/cubeTop.png","res/images/night/cubeBot.png","res/images/night/cubeSides.png","res/images/night/cubeSides.png"})
+						"res/textures/day/cubeSides4.png"}),
+				new Texture(new String[]{
+						"res/textures/night/cubeSides1.png",
+						"res/textures/night/cubeSides3.png",
+						"res/textures/night/cubeTop.png",
+						"res/textures/night/cubeBot.png",
+						"res/textures/night/cubeSides2.png",
+						"res/textures/night/cubeSides4.png"})
 		};
 		graphics = new GraphicsObject(vertexCoords, indices);
 		time = DAY;
@@ -60,8 +66,19 @@ public class SkyBox implements Renderable{
 	 */
 	@Override
 	public void render(Shaderprogram shader, Matrix4f projection_matrix) {
-		texture[time].bindCube(GL13.GL_TEXTURE0);
+		int daytime;
+		if(Scene.dayTime){
+			texture[0].bindCube(GL13.GL_TEXTURE0);
+			daytime = 0;
+		}
+		else {
+			texture[1].bindCube(GL13.GL_TEXTURE0);
+			daytime = 1;
+		}
+		
 		shader.setUniform1i("tex", 0);
+		
+		shader.setUniform1i("daytime", daytime);
 		graphics.render(shader, projection_matrix);
 	}
 

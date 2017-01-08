@@ -22,6 +22,10 @@ public class Landscape implements Renderable{
 	public void render(Shaderprogram shader, Matrix4f projection_matrix) {
 		texture.bind(GL13.GL_TEXTURE0);
 		shader.setUniform1i("tex0", 0);
+		int daytime;
+		if(Scene.dayTime) daytime = 0;
+		else daytime = 1;
+		shader.setUniform1i("daytime", daytime);
 		graphics.render(shader, projection_matrix);
 		
 	}

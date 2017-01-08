@@ -18,11 +18,20 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 	private Scene parent;
 	private Jump jump;
 	
+	private Monster monster = new Monster();
+	
 	private static GraphicsObject[] models = {
 			new GraphicsObject("res/models/bunny_idle.obj"), 	
 			new GraphicsObject("res/models/bunny_standing.obj"), 	
 			new GraphicsObject("res/models/bunny_jump_1.obj"), 	
 			new GraphicsObject("res/models/bunny_jump_2.obj"), 	
+	};
+	
+	private static Texture[] textures = {
+			new Texture("res/textures/bunny/tex1.jpg"),
+			new Texture("res/textures/bunny/tex2.jpg"),
+			new Texture("res/textures/bunny/tex4.jpg"),
+			new Texture("res/textures/bunny/tex3.jpg")
 	};
 	
 	public static void initBunnyModels(){
@@ -34,6 +43,7 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 	@Override
 	public void setCamera(Camera camera){
 		for (GraphicsObject each: models) each.setCamera(camera);
+		monster.setCamera(camera);
 	}
 	
 	private static Texture environmentMap = new Texture(new String[]{
@@ -56,17 +66,26 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 	
 	@Override
 	public void render(Shaderprogram shader, Matrix4f projection_matrix) {
-		graphics = models[state];
-		environmentMap.bindCube(GL13.GL_TEXTURE0);
-		shader.setUniform1i("tex0", 0);
-		shader.setUniform1f("shininess", 10f);
-		shader.setUniform3f("light_position", new Vector3f(0f,100f, 50f));
-		// TODO Auto-generated method stub
-		super.render(shader, projection_matrix);
+		if(Scene.dayTime){
+			graphics = models[state];
+			environmentMap.bindCube(GL13.GL_TEXTURE0);
+			shader.setUniform1i("tex0", 0);
+			textures[state].bind(GL13.GL_TEXTURE1);
+			shader.setUniform1i("tex1", 1);
+			shader.setUniform1f("shininess", 10f);
+			shader.setUniform3f("light_position", new Vector3f(0f,100f, 50f));
+			// TODO Auto-generated method stub
+			super.render(shader, projection_matrix);
+		}else{
+			monster.model_matrix = model;
+			monster.render(shader, projection_matrix);
+		}
+	
 	}
 
 	@Override
 	public void update(double deltaTime) {
+		
 		Vector3f heroToBunny = new Vector3f();
 		this.position.sub(hero.position, heroToBunny);
 		float distance = heroToBunny.length();
@@ -83,12 +102,21 @@ public class Bunny extends GameObject implements Renderable, Updateable{
 		dir.normalize();
 		float alpha = dir.dot(bunnyToHero);
 		
-		if(alpha > -0.5f && distance < 8f && jump == null) jump = new Jump(this);
-		if(jump != null) jump.proceed(deltaTime);
-		if(distance < 0.5f && jump == null) {
-			parent.killBunny(this);
-			parent.spawnParticleField(hero.position);
+		if(Scene.dayTime){
+		
+			if(alpha > -0.5f && distance < 8f && jump == null) jump = new Jump(this);
+			if(jump != null) jump.proceed(deltaTime);
+			if(distance < 0.5f && jump == null) {
+				parent.killBunny(this);
+				parent.spawnParticleField(hero.position);
+				parent.spawnBunny();
+			}
+		} else {
+			setPosition(position.add(bunnyToHero.mul((float)deltaTime * 10)));
+			if(distance < 0.5f) Scene.dayTime = true;
 		}
+		
+		//if(position.z < 0) System.out.println("why??");
 	}
 	
 	public void killJump(){

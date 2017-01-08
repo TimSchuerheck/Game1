@@ -93,6 +93,10 @@ public class Grass implements Renderable{
 		graphics.model_matrix = model;
 		texture[texSelector].bind(GL13.GL_TEXTURE0);
 		shader.setUniform1i("tex0", 0);
+		int daytime;
+		if(Scene.dayTime) daytime = 0;
+		else daytime = 1;
+		shader.setUniform1i("daytime", daytime);
 		graphics.render(shader, projection_matrix);
 	}
 

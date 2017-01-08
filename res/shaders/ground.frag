@@ -11,6 +11,7 @@ uniform sampler2D tex0;
 uniform sampler2D tex1;
 uniform vec3 light_color;
 uniform float shininess;
+uniform int daytime;
 
 void main(){
 
@@ -19,6 +20,12 @@ void main(){
 		vec3 to_light_vector_norm	 	= normalize(to_light_vector);
 		vec3 ref_to_light_norm 			= normalize(reflect(-to_light_vector_norm, surface_normal_norm));
 		
+		vec3 horizon_color;
+		if(daytime == 0){
+			horizon_color = vec3(38.0/255.0, 19.0/255.0, 140.0/255.0);
+		} else {
+			horizon_color = vec3(140.0/255.0, 19.0/255.0, 38.0/255.0);
+		}
 		
        //ambient light
        vec4 ambient_light   = vec4(light_color * 0.02f,1.0);
@@ -28,16 +35,23 @@ void main(){
          vec3 diffuseTerm	= texture(tex0, tc_vert).rgb * vec3(0.95, 1.05, 0.5);
         //vec3 diffuseTerm	= texture(tex0, tc_vert).rgb  * cos_alpha;
 		
-		vec3 horizon_blending = vec3(38.0/255.0, 19.0/255.0, 140.0/255.0) * max(0.0 ,(0.9 - cos_alpha * 1.3) * 1.1);
+		vec3 horizon_blending = horizon_color * max(0.0 ,(0.9 - cos_alpha * 1.3) * 1.1);
 		
        //TODO specular light cube.frag
         float cos_beta 		= max(0.0, dot(ref_to_light_norm , to_camera_vector_norm));
         float cos_betaK 	= pow(cos_beta, shininess);
 		vec3 specularTerm 	= texture(tex1, tc_vert).rgb * cos_betaK;
 		
-
-
   		color = vec4(horizon_blending + diffuseTerm + specularTerm * 1.5, 1.0);
+      
+      	if( daytime == 1 ){
+      
+      	float sum = color.r + color.g + color.b;
+      	float q = sum/3;
+      	 color = vec4( q , q , q + 0.03 , 1.0);
+      	 
+        }
+        
         //color = vec4( diffuseTerm + specularTerm * 1.5 ,1.0) + ambient_light;
 
        if(color.w < 1.0)

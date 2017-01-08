@@ -51,14 +51,22 @@ public class MyWindow extends Window {
 
 	
 	private void checkKeys(double deltaTime) {
-		if (Input.keys[GLFW_KEY_W])
+		if (Input.keys[GLFW_KEY_W]){
 			scene.camera.move("FRONT", deltaTime);
-		if (Input.keys[GLFW_KEY_S])
+			scene.girl.moving();
+		}
+		if (Input.keys[GLFW_KEY_S]){
 			scene.camera.move("BACK", deltaTime);
-		if (Input.keys[GLFW_KEY_D])
+			scene.girl.moving();
+		}
+		if (Input.keys[GLFW_KEY_D]){
 			scene.camera.move("RIGHT", deltaTime);
-		if (Input.keys[GLFW_KEY_A])
+			scene.girl.moving();
+		}
+		if (Input.keys[GLFW_KEY_A]){
 			scene.camera.move("LEFT", deltaTime);
+			scene.girl.moving();
+		}
 	}
 
 	// Gets called everytime the image is rendered //
@@ -99,6 +107,10 @@ public class MyWindow extends Window {
 
 		if (pressedKey == GLFW_KEY_ESCAPE) {
 			glfwSetWindowShouldClose(window, GL_TRUE);
+		}
+		
+		if (pressedKey == GLFW_KEY_SPACE) {
+			Scene.dayTime = !Scene.dayTime;
 		}
 
 		if (pressedKey == GLFW_KEY_W)

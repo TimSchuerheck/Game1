@@ -41,6 +41,8 @@ public class FlyThroughCamera extends Camera {
 		GLFW.glfwGetCursorPos(window, x, y);
 		lastX = x.get(0);
 		lastY = y.get(0);
+		
+
 	}
 
 	public void setTarget(GameObject target){
@@ -70,12 +72,15 @@ public class FlyThroughCamera extends Camera {
 				velocity.x -= acceleration * (float) deltaTime;
 			break;
 		}
+		
+
 	}
 
 	public void checkForMovement(double deltaTime) {
-
+		if(velocity.y < -0.05f || velocity.y > 0.05f || velocity.x < -0.05f || velocity.x > 0.05f){
 			turnCameraLeft(deltaTime);
 			moveCameraBackwards(deltaTime);
+		}
 
 		if (velocity.y > 0)
 			velocity.y -= decelerationY * (float) deltaTime;
@@ -90,8 +95,6 @@ public class FlyThroughCamera extends Camera {
 			velocity.x += decelerationX * (float) deltaTime;
 		}
 
-		//if(velocity.y > -0.03 && velocity.y < 0.03) velocity.y = 0f;
-		//if(velocity.x > -0.03 && velocity.x < 0.03) velocity.x = 0f;
 
 	}
 
@@ -122,7 +125,6 @@ public class FlyThroughCamera extends Camera {
 		view_matrix = new Matrix4f().lookAt(cameraPosition, target, upVector);
 		decelerationX = DECELERATION;
 		decelerationY = DECELERATION;
-		
 		targetObject.setPosition(new Vector3f(target).sub(0f, 1.5f, 0f));
 		targetObject.setRotation(-sideAngle);
 	}
@@ -143,7 +145,8 @@ public class FlyThroughCamera extends Camera {
 		Vector3f viewDirection = new Vector3f(targetToCamera.negate());
 		viewDirection.y = 0;
 		Vector3f rightDirection = viewDirection.cross(new Vector3f(0f, 1f, 0f));
-		target.add(rightDirection.mul((float) (velocity.x * deltaTime)));
+		if(velocity.x > 0.1f)
+			target.add(rightDirection.mul((float) (velocity.x * deltaTime)));
 	}
 
 	// This actually moves the camera instead of turning it
@@ -152,20 +155,23 @@ public class FlyThroughCamera extends Camera {
 		Vector3f viewDirection = new Vector3f(targetToCamera);
 		viewDirection.y = 0;
 		Vector3f leftDirection = viewDirection.cross(new Vector3f(0f, 1f, 0f));
-		target.add(leftDirection.mul((float) (velocity.x * deltaTime)));
+		if(velocity.y < -0.1f || velocity.y > 0.1f);
+			target.add(leftDirection.mul((float) (velocity.x * deltaTime)));
 	}
 
 	@Override
 	public void moveCameraForwards(double deltaTime) {
 		Vector3f viewDirection = new Vector3f(targetToCamera);
 		viewDirection.y = 0;
-		target.sub(viewDirection.mul((float) (velocity.y * deltaTime)));
+		if(velocity.y > 0.1f)
+			target.sub(viewDirection.mul((float) (velocity.y * deltaTime)));
 	}
 
 	@Override
 	public void moveCameraBackwards(double deltaTime) {
 		Vector3f viewDirection = new Vector3f(targetToCamera);
 		viewDirection.y = 0;
-		target.sub(viewDirection.mul((float) (velocity.y * deltaTime)));
+		if(velocity.y < -0.1f || velocity.y > 0.1f && target.x < 100 && target.x > -100);
+			target.sub(viewDirection.mul((float) (velocity.y * deltaTime)));
 	}
 }

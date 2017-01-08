@@ -37,7 +37,8 @@ public class Jump {
 			float hFac;
 			if(lifeTime > 0.5f) hFac = (1 - (lifeTime - 0.5f)/0.5f) * height;
 			else hFac = (lifeTime / 0.5f) * height;
-
+			
+			if(height * hFac > 0)
 			newPos.add(0f, height * hFac, 0f);
 			
 			parent.setPosition(newPos);

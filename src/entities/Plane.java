@@ -59,6 +59,12 @@ import graphics.Texture;
 			shader.setUniform3f("light_color", new Vector3f(0f,1f,0.1f));
 			shader.setUniform1f("shininess", 1f);
 			shader.setUniform3f("light_position", new Vector3f(0f,100f, 0f));
+			
+			int daytime;
+			if(Scene.dayTime) daytime = 0;
+			else daytime = 1;
+			
+			shader.setUniform1i("daytime", daytime);
 			ground.render(shader, projection_matrix);
 
 		}

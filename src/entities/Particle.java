@@ -67,7 +67,6 @@ public class Particle implements Renderable{
 		yRotation = (float) (Math.random() * 360);
 	}
 	
-	
 	@Override
 	public void render(Shaderprogram shader, Matrix4f projection_matrix) {
 		Matrix4f viewproj = new Matrix4f();

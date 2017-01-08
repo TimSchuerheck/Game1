@@ -13,7 +13,7 @@ public class GameObject implements Renderable{
 	protected Vector3f position = new Vector3f();;
 	protected float rotation = 0f;
 	protected float scale = 1f;
-	private Matrix4f model = new Matrix4f();
+	protected Matrix4f model = new Matrix4f();
 	
 	public GameObject(){
 		boundingBox = new BoundingBox();
@@ -24,9 +24,11 @@ public class GameObject implements Renderable{
 	}
 	
 	public void setPosition(Vector3f pos){
-		boundingBox.setLocation(pos);
-		position = pos;
-		updateModel_matrix();
+		if(pos.x > -100 && pos.x < 100 && pos.z > -100 && pos.z < 100){
+			//boundingBox.setLocation(pos);
+			position = pos;
+			updateModel_matrix();
+		}
 	}
 	
 	public void setScale(float scale){
